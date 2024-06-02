@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Luck</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            color: #000000;
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question h3 {
+            margin-bottom: 10px;
+        }
+        .question input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin: 5px 0;
+            border: 1px solid #000000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .submit-btn, .next-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #000000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            margin-top: 10px;
+        }
+        #popupImage {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 300px;
+            height: 300px;
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        #popupImage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #popupImage button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Happy Birthday</h1>
+    <h5>Remember, pass rate is 100%....</h5>
+    <div id="questionNumber" style="text-align: center;">Question 1 of 10</div>
+    <form id="quizForm">
+        <div class="question">
+            <h3>1. In the state of North Carolina, what fast food chain serves the superior breakfast?</h3>
+            <input type="text" name="q1">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>2. Who's your favorite child?</h3>
+            <input type="text" name="q2">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>3. Who's your second favorite child?</h3>
+            <input type="text" name="q3">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>4. In your opinion, what's the best credit union?</h3>
+            <input type="text" name="q4">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>5. Who does Gammy & Zadie love the most?</h3>
+            <input type="text" name="q5">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>6. Who does the world revolve around?</h3>
+            <input type="text" name="q6">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>7. What is the best, most perfect, creature to walk God's earth?</h3>
+            <input type="text" name="q7">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>8. Whose bitch are you? Please write their name in singular form.</h3>
+            <input type="text" name="q8">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>9. What's the worst vegetable? In terms of taste, nutrition, and aesthetics.</h3>
+            <input type="text" name="q9">
+        </div>
+        <div class="question" style="display: none;">
+            <h3>10. Starbucks or Dunkin?</h3>
+            <input type="text" name="q10">
+        </div>
+        <button type="button" class="next-btn" onclick="nextQuestion()">Next</button>
+        <button type="button" class="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Answers</button>
+    </form>
+    <div id="result" style="text-align: center; margin-top: 20px;"></div>
+
+    <div id="popupImage">
+        <button onclick="closePopup()">X</button>
+        <img src="" alt="Popup Image" id="popupImg">
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const totalQuestions = 10;
+
+        function showQuestion(index) {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, i) => {
+                question.style.display = i === index ? 'block' : 'none';
+            });
+            document.getElementById('questionNumber').innerText = `Question ${index + 1} of ${totalQuestions}`;
+            document.querySelector('.next-btn').style.display = index === totalQuestions - 1 ? 'none' : 'block';
+            document.querySelector('.submit-btn').style.display = index === totalQuestions - 1 ? 'block' : 'none';
+        }
+
+        function nextQuestion() {
+            const form = document.getElementById('quizForm');
+            const formData = new FormData(form);
+
+            const answers = {
+                q1: ['Bojangles', 'bojangles', 'bojos'],
+                q2: ['Mollie', 'mollie', 'Will', 'will'],
+                q3: ['Will', 'will', 'Mollie', 'mollie'],
+                q4: ['SECU', 'secu', 'state employees credit union', 'State Employees Credit Union'],
+                q5: ['Andy', 'andy'],
+                q6: ['Will', 'will', 'Mollie', 'mollie', 'the geese', 'Amy', 'amy', 'Aaron', 'aaron', 'Max', 'max', 'Andy', 'andy', 'Chris', 'chris', 'Eliza', 'eliza', 'Mom', 'mom', 'Dad', 'dad', 'Susan', 'susan', 'Norm', 'norm', 'Gammy', 'gammy', 'Zadie', 'zadie'],
+                q7: ['Geese', 'geese'],
+                q8: ['Chris', 'chris'],
+                q9: ['Broccoli', 'broccoli'],
+                q10: ['Tim Hortons', 'tim hortons'],
+            };
+
+            let isCorrect = false;
+            const currentQuestionName = `q${currentQuestion + 1}`;
+            const userAnswer = formData.get(currentQuestionName).trim().toLowerCase();
+
+            if (answers[currentQuestionName].some(correctAnswer => correctAnswer.toLowerCase() === userAnswer)) {
+                isCorrect = true;
+            }
+
+            showPopup(isCorrect);
+
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                setTimeout(() => {
+                    showQuestion(currentQuestion);
+                    closePopup();
+                }, 2000); // Change this value to control how long the popup stays visible
+            }
+        }
+
+        function showPopup(isCorrect) {
+            const popup = document.getElementById('popupImage');
+            const img = document.getElementById('popupImg');
+            const images = [
+                {correct: 'correct_image1.jpg', incorrect: 'incorrect_image1.jpg'},
+                {correct: 'correct_image2.jpg', incorrect: 'incorrect_image2.jpg'},
+                {correct: 'correct_image3.jpg', incorrect: 'incorrect_image3.jpg'},
+                {correct: 'correct_image4.jpg', incorrect: 'incorrect_image4.jpg'},
+                {correct: 'correct_image5.jpg', incorrect: 'incorrect_image5.jpg'},
+                {correct: 'correct_image6.jpg', incorrect: 'incorrect_image6.jpg'},
+                {correct: 'correct_image7.jpg', incorrect: 'incorrect_image7.jpg'},
+                {correct: 'correct_image8.jpg', incorrect: 'incorrect_image8.jpg'},
+                {correct: 'correct_image9.jpg', incorrect: 'incorrect_image9.jpg'},
+                {correct: 'correct_image10.jpg', incorrect: 'incorrect_image10.jpg'}
+            ];
+
+            const image = images[currentQuestion];
+            img.src = isCorrect ? image.correct : image.incorrect;
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popupImage');
+            popup.style.display = 'none';
+        }
+
+        function submitQuiz() {
+            const form = document.getElementById('quizForm');
+            const formData = new FormData(form);
+            let correctAnswers = 0;
+
+            const answers = {
+                q1: ['Bojangles', 'bojangles', 'bojos'],
+                q2: ['Mollie', 'mollie', 'Will', 'will'],
+                q3: ['Will', 'will', 'Mollie', 'mollie'],
+                q4: ['SECU', 'secu', 'state employees credit union', 'State Employees Credit Union'],
+                q5: ['Andy', 'andy'],
+                q6: ['Will', 'will', 'Mollie', 'mollie', 'the geese', 'Amy', 'amy', 'Aaron', 'aaron', 'Max', 'max', 'Andy', 'andy', 'Chris', 'chris', 'Eliza', 'eliza', 'Mom', 'mom', 'Dad', 'dad', 'Susan', 'susan', 'Norm', 'norm', 'Gammy', 'gammy', 'Zadie', 'zadie'],
+                q7: ['Geese', 'geese'],
+                q8: ['Chris', 'chris'],
+                q9: ['Broccoli', 'broccoli'],
+                q10: ['Tim Hortons', 'tim hortons'],
+            };
+
+            for (let [question, answer] of formData.entries()) {
+                if (answers[question].some(correctAnswer => correctAnswer.toLowerCase() === answer.trim().toLowerCase())) {
+                    correctAnswers++;
+                }
+            }
+
+            document.getElementById('result').innerText = `You got ${correctAnswers} out of ${totalQuestions} correct.`;
+        }
+
+        showQuestion(currentQuestion);
+    </script>
+</body>
+</html>
